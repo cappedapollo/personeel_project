@@ -1,0 +1,17 @@
+.text-blue { color: #0000ff; }
+
+.text-yellow { color: #e8ded3; }
+.bg-yellow { background-color: #e8ded3 !important; }
+.bg-dark-yellow { background-color: #cdb8a0 !important; }
+
+.text-bblack, .text-bblack-hover:hover { color: #123948 !important; }
+.bg-bblack { background-color: #123948 !important; }
+.bg-light-bblack { background-color: #50afd3 !important; }
+
+.text-dark-yellow { color: #ffb536; }
+
+/* .apexcharts-tooltip {
+  color: #e2d6c9 !important;;
+} */
+
+/* .apexcharts-yaxis, .apexcharts-xaxis-inversed { width: 50% !important; } */
