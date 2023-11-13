@@ -106,7 +106,7 @@ class CeleryController extends Controller
                 // Update
                 $celery_user['first_name'] = $e['first_name'];
                 $celery_user['last_name'] = $e['surname'];
-                $celery_user['country_code'] = null;
+                $celery_user['email'] = $e["contact"]['email'];
                 // $celery_user['telephone'] = $e['contact']['phone'];
                 $celery_user['function'] = $e['position'];
                 $celery_user->save();
@@ -122,7 +122,7 @@ class CeleryController extends Controller
                 $new['celery_id'] = $e['id'];
                 $new['first_name'] = $e['first_name'];
                 $new['last_name'] = $e['surname'];
-                $new['email'] = $e["id"].'@celery.com';
+                $new['email'] = $e["contact"]['email'];
                 $new['password'] = Hash::make($password);
                 $new['country_code'] = null;
                 // $new['telephone'] = $e['contact']['phone'];

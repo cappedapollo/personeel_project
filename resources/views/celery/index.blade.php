@@ -40,7 +40,7 @@
     			</select>
 			</div>
             <div class="col-lg-2">
-                <button class="btn btn-primary d-none" onclick="SaveEmployees()">Save</button>
+                <button class="btn btn-primary btn-block" onclick="SaveEmployees()">Save</button>
             </div>
 		</div>
 
@@ -134,22 +134,16 @@
 			method: 'GET',
 			success: function(data) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
-                tableData = data;
+                tableData = data.filter(({contact: {email}})=>!!email);
                 DataTableEl.clear();
-                if(data && data.length > 0) {
-                    data = data.map(({
-                        full_name,
-                        nationality,
-                        date_of_birth,
-                        place_of_birth,
-                        department,
+                if(tableData && tableData.length > 0) {
+                    data = tableData.map(({
+                        first_name,
+                        surname,
                         position,
                     })=> ({
-                        full_name,
-                        nationality,
-                        date_of_birth,
-                        place_of_birth,
-                        department,
+                        first_name,
+                        surname,
                         position,
                     }));
                     
@@ -158,7 +152,7 @@
                 }
                 DataTableEl.rows.add(data);
                 DataTableEl.draw();
-                if(data.length > 0) SaveEmployees();
+                // if(data.length > 0) SaveEmployees();
 			},
 			error: function(xhr, status, error) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
@@ -168,6 +162,18 @@
 	}
 
     function SaveEmployees() {
+        if(tableData.length === 0) {
+            swal.fire({
+                text: "There is no data to import.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn font-weight-bold btn-light-primary"
+                }
+            });
+            return;
+        };
         $.ajax({
             beforeSend: () => {
                 LOADER_EL.removeClass("d-none").addClass("d-flex");
@@ -211,11 +217,8 @@
     $(function() {
         DataTableEl = $('#employee_table').DataTable({
             "columns": [
-                { "title": "Full Name", "data": "full_name" },
-                { "title": "Nationality", "data": "nationality" },
-                { "title": "DOB", "data": "date_of_birth", "render": (data, type, row) => data.split("T")[0]},
-                { "title": "POB", "data": "place_of_birth" },
-                { "title": "Department", "data": "department" },
+                { "title": "First Name", "data": "first_name" },
+                { "title": "Last Name", "data": "surname" },
                 { "title": "Position", "data": "position" }
             ]
         });
