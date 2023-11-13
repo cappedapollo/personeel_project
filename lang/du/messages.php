@@ -45,7 +45,7 @@ return [
 				<div>2) Noteer onder <b>Toelichting en/of voorbeelden:</b> een uitgebreidere omschrijving. </div>
 				<div>3) Wil je extra doelstellingen toevoegen? Klik dan op de knop ADD MORE en herhaal voor elke extra doelstelling stap 1) en stap 2).</div>
 				<div>4) Wil je een doelstelling verwijderen? Klik dan achter de te verwijderen doelstelling op de rode knop met het kruisje.</div></p>
-				<p>Klik onderaan de pagina op de knop \'˜Opslaan\' om je gekozen competenties en doelstellingen op te slaan.<br/></p>',
+				<p>Klik onderaan de pagina op de knop \'ï¿½Opslaan\' om je gekozen competenties en doelstellingen op te slaan.<br/></p>',
     'expl_competencies_manager' => 'Op deze pagina leg je aan het begin van een beoordelingsperiode vast op basis van welke competenties en doelstellingen de medewerker beoordeeld zal worden.<br/>
 	<b>In sommige bedrijven worden de competenties (en soms ook de doelstellingen) per medewerker door de Directie vastgesteld en door de PB Online Admin alvast in het systeem gezet. Als beoordelaar hoef je die dan niet meer in te vullen.</b><br/>
 	<br/><b>Competenties:</b> Er zijn zeven verschillende competentiecategorie&euml;n waaruit gekozen kan worden.<br/>
@@ -62,7 +62,7 @@ return [
 				<div>2) Noteer onder <b>Toelichting en/of voorbeelden:</b> een uitgebreidere omschrijving. </div>
 				<div>3) Wil je extra doelstellingen toevoegen? Klik dan op de knop ADD MORE en herhaal voor elke extra doelstelling stap 1) en stap 2).</div>
 				<div>4) Wil je een doelstelling verwijderen? Klik dan achter de te verwijderen doelstelling op de rode knop met het kruisje.</div></p>
-				<p>Klik onderaan de pagina op de knop \'˜Opslaan\' om je gekozen competenties en doelstellingen op te slaan.<br/></p>',
+				<p>Klik onderaan de pagina op de knop \'ï¿½Opslaan\' om je gekozen competenties en doelstellingen op te slaan.<br/></p>',
     'expl_users_admin' => 'In het onderstaande overzicht staan alle medewerkers die aan de PB Online-omgeving van de organisatie zijn toegevoegd.<br/>
 
 				<p>Via het keuzemenu onder <b>Rol:</b> kun je ervoor kiezen alleen de medewerkers met een bepaalde rol (Medewerker, Beoordelaar of Company Admin) weer te geven.<br/></p>
@@ -123,7 +123,7 @@ return [
 				<p>Op deze pagina vind je een overzicht van de eerder gekozen competenties en doelstellingen op basis waarvan de medewerker beoordeeld zal worden. Voorafgaand aan het planningsgesprek kun je op deze pagina enkele aanvullende gegevens toevoegen, en daarna alle informatie voor het planningsgesprek opslaan in een handig PDF-formulier dat je desgewenst kunt uitprinten en meenemen naar het gesprek.</p>
 
 				<b>Instructies</b><br/>
-				1)Is bij het planningsgesprek een toehoorder aanwezig? Zo ja, vul dan bovenaan de pagina onder \'˜Naam:\' de naam van deze toehoorder in.<br/>
+				1)Is bij het planningsgesprek een toehoorder aanwezig? Zo ja, vul dan bovenaan de pagina onder \'ï¿½Naam:\' de naam van deze toehoorder in.<br/>
 
 				<b>Toehoorders zijn personen die buiten de beoordelaar en de medewerker bij het gesprek aanwezig zijn. Dit kan bijvoorbeeld iemand van HR zijn, of een senior op een afdeling die input heeft geleverd voor het gesprek.</b><br/>
 
@@ -154,14 +154,14 @@ return [
 				<p>Op deze pagina vind je een overzicht van de eerder gekozen competenties en doelstellingen op basis waarvan de medewerker beoordeeld zal worden. Voorafgaand aan of tijdens het functioneringsgesprek kun je op deze pagina enkele aanvullende gegevens en opmerkingen toevoegen. Het (concept) PDF-formulier kun je uitprinten en meenemen naar het gesprek.</p>
 
 				<b>Instructies</b><br/>
-				1)Is bij het functioneringsgesprek een toehoorder aanwezig? Vul vul dan bovenaan de pagina onder \'˜Naam:\' de naam van deze toehoorder in. <br/>
+				1)Is bij het functioneringsgesprek een toehoorder aanwezig? Vul vul dan bovenaan de pagina onder \'ï¿½Naam:\' de naam van deze toehoorder in. <br/>
 
 				<b>Toehoorders zijn personen die buiten de beoordelaar en de medewerker bij het gesprek aanwezig zijn. Dit kan bijvoorbeeld iemand van HR zijn, of een senior op een afdeling die input heeft geleverd voor het gesprek.</b><br/>
 
 				2)Voeg in het competentie-overzicht naar wens een toelichting en/of voorbeelden toe in het tekstvak onder elk van de competentiecategorie&euml;n.<br/>
 				3)Voeg in het doelstellingenoverzicht naar wens een toelichting en/of voorbeelden toe in het tekstvak onder elk van de doelstellingen.<br/>
-				4)Voeg onderaan de pagina in het tekstvak onder \'˜Algemeen\' naar wens algemene opmerkingen voor het functioneringsgesprek toe.<br/>
-				5)Wil je de informatie tussentijds opslaan en later nog verder bewerken? Klik dan op de knop \'˜OPSLAAN\'.<br/>
+				4)Voeg onderaan de pagina in het tekstvak onder \'ï¿½Algemeen\' naar wens algemene opmerkingen voor het functioneringsgesprek toe.<br/>
+				5)Wil je de informatie tussentijds opslaan en later nog verder bewerken? Klik dan op de knop \'ï¿½OPSLAAN\'.<br/>
 				6)Is de informatie compleet en wil je deze opslaan in een PDF-formulier dat je kunt uitprinten en meenemen naar het gesprek? Klik dan op de knop Opslaan & PDF.<br/>
 				7)Na het gesprek klik je op de knop "Opslaan en Ondertekenen" en volg je de instructies op het scherm op. Hiermee sla je het formulier definitief op in het online archief van de medewerker. De medewerker ontvangt meteen een email hierover.<br/>'],
         '3'=> ['admin'=>'<p>Het beoordelingsgesprek is de afsluiting van het beoordelingsjaar. Dit gesprek vindt meestal plaats in november/december. Tijdens het beoordelingsgesprek bespreek je met de medewerker hoe hij/zij gepresteerd heeft op de competenties en doelstellingen die aan het begin van het beoordelingsjaar zijn vastgelegd.</p>
@@ -191,7 +191,7 @@ return [
 <p>Op deze pagina vind je het beoordelingsformulier voor de medewerker. In dit beoordelingsformulier staan alle eerder gekozen competenties en doelstellingen op basis waarvan de medewerker beoordeeld zal worden. Voorafgaand aan het beoordelingsgesprek vul je dit formulier in en print je het uit, zodat je het kunt meenemen naar het gesprek.</p>
 
 <b>Instructies</b><br/>
-1) Is bij het beoordelingsgesprek een toehoorder aanwezig? Vul dan bovenaan de pagina onder \'˜Naam:\' de naam van deze toehoorder in.<br/>
+1) Is bij het beoordelingsgesprek een toehoorder aanwezig? Vul dan bovenaan de pagina onder \'ï¿½Naam:\' de naam van deze toehoorder in.<br/>
 
 <b>Toehoorders zijn personen die buiten de beoordelaar en de medewerker bij het gesprek aanwezig zijn. Dit kan bijvoorbeeld iemand van HR zijn, of een senior op een afdeling die input heeft geleverd voor het gesprek.</b><br/>
 

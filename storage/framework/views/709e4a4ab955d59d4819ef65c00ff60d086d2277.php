@@ -1,3 +1,8 @@
+<?php $__env->startPush('styles'); ?>
+<?php $__currentLoopData = config('layout.resources.index_css'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $style): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <link href="<?php echo e(asset($style)); ?>" rel="stylesheet" type="text/css"/>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+<?php $__env->stopPush(); ?>
 <?php $__env->startPush('scripts'); ?>
 <?php $__currentLoopData = config('layout.resources.index_js'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $script): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <script src="<?php echo e(asset($script)); ?>" type="text/javascript"></script>
@@ -48,6 +53,9 @@ $template_dir = config('filesystems.dirs.template');
         				</div>
         			</div>
         			<!-- <a href="<?php echo e(asset($storage_path.$template_dir.'/personeel_template.csv')); ?>" class="btn btn-secondary mr-2"><?php echo e(__('form.label.download').' '.__('form.label.template')); ?></a> -->
+
+					<a href="<?php echo e('https://login.celerypayroll.com/oauth2/authorize?scope=offline_access&client_id=8f771a5a-15a9-47ab-9670-1f8c09a1722b&response_type=code&redirect_uri='. urlencode(url('/celery/callback'))); ?>" class="btn btn-outline-danger mr-2"><?php echo e(__('form.label.import').' '.__('form.label.from').' '.__('form.label.celery')); ?></a>
+
         		</div>
         	</div>
 			<div class="card-body">

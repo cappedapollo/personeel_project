@@ -23,49 +23,6 @@
 
 <div class="card card-custom">
 	<div class="card-body">
-		
-
-		<div class="row mb-2">
-			<div class="col-6"></div>
-			<div class="col-3">
-				<a target="_blank" href="https://login.celerypayroll.com/oauth2/authorize?client_id=8f771a5a-15a9-47ab-9670-1f8c09a1722b&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fcelery%2Fcallback"
-				class="btn btn-sm btn-block btn-primary">OAuth Code</a>
-			</div>
-		</div>
-		<div class="row mb-2">
-			<div class="col-6">
-				<input type="text" class="form-control form-control-sm" id="code" placeholder="Code">
-			</div>
-			<div class="col-3">
-				<button class="btn btn-sm btn-primary btn-block" onclick="AuthToken()">Auth Token</button>
-			</div>
-		</div>
-		<div class="row mb-2">
-			<div class="col-6">
-				<input type="text" class="form-control form-control-sm" id="token" placeholder="Token">
-			</div>
-			<div class="col-3">
-				<button class="btn btn-sm btn-primary btn-block" onclick="GetContext()">Get Context</button>
-			</div>
-		</div>
-
-		<div class="row mb-2">
-			<div class="col-6">
-				<input type="text" class="form-control form-control-sm" id="context_id" placeholder="Context">
-			</div>
-			<div class="col-3">
-				<button class="btn btn-sm btn-primary btn-block" onclick="GetEmployers()">Get Employers</button>
-			</div>
-		</div>
-
-		<div class="row mb-2">
-			<div class="col-6">
-				<input type="text" class="form-control form-control-sm" id="employer_id" placeholder="Employer">
-			</div>
-			<div class="col-3">
-				<button class="btn btn-sm btn-primary btn-block" onclick="GetEmployees()">Get Employees</button>
-			</div>
-		</div>
 
 		<input type="hidden" id="mng_btn_text" value="{{ trans_choice('form.label.manager', 1) }}">
 		
@@ -131,59 +88,6 @@
 @endsection
 @push('scripts')
 <script>
-	function AuthToken() {
-		$.ajax({
-			url: 'https://login.celerypayroll.com/oauth2/token',
-			method: 'POST',
-			headers: {
-				"Authorization": "Basic {{ base64_encode("8f771a5a-15a9-47ab-9670-1f8c09a1722b" . ":" . "jXmuW4Vt-3KNH1mcN218fg4Ooh7hcN8OnAP_BjU0LEQ") }}",
-				"Content-Type": "application/x-www-form-urlencoded"
-			},
-			data: {
-				grant_type: 'authorization_code',
-				code: $("#code").val(),
-				redirect_uri: "http://127.0.0.1:8000/celery/callback"
-			},
-			success: function(data) {
-				$("#token").val(data["access_token"]);
-			},
-			error: function(xhr, status, error) {
-				console.error(error);
-			}
-		});
-	}
-
-	function GetContext() {
-		const ACCESS_TOKEN = $("#token").val();
-		$.ajax({
-			url: '/contexts?token=' + ACCESS_TOKEN,
-			method: 'GET',
-			success: function(data) {
-				if(data.data.length === 0) alert("no context");
-				else $("#context_id").val((data.data[0].id));
-			},
-			error: function(xhr, status, error) {
-				console.error(error);
-			}
-		});
-	}
-
-	function GetEmployers() {
-		const ACCESS_TOKEN = $("#token").val();
-		const CONTEXT_ID = $("#context_id").val();
-		$.ajax({
-			url: '/employers?token=' + ACCESS_TOKEN + '&context_id=' + CONTEXT_ID,
-			method: 'GET',
-			success: function(data) {
-				if(data.data.length === 0) alert("no employer");
-				else $("#employer_id").val((data.data[0].id));
-			},
-			error: function(xhr, status, error) {
-				console.error(error);
-			}
-		});
-	}
-
 $(function() {
 	
 });

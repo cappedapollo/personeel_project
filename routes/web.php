@@ -13,9 +13,8 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\ReviewTypeController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\CeleryController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -31,55 +30,15 @@ Route::get('/', function () {
     return redirect(app()->getLocale());
 });
 
-Route::get("/contexts", function(Request $req) {
-
-    $response = Http::withHeaders([
-        // 'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
-        'Authorization' => 'Bearer ' . $req->get("token")
-    ])
-        ->get('https://api-v3.celerypayroll.com/contexts');
-    
-    // Check if the request was successful
-    if ($response->successful()) {
-        // Process the response
-        $data = $response->json(); // Assuming the response is in JSON format
-        // You can also use $response->body() to access the raw response content
-        // or $response->status() to get the HTTP status code
-        // ...
-        return $data;
-    } else {
-        // Handle the request failure
-        echo 'GET request failed. Status code: ' . $response->status();
-    }
-});
-
-Route::get("/employers", function(Request $req) {
-
-    $response = Http::withHeaders([
-        // 'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
-        'X-Celery-Context-Id' => $req->get("context_id"),
-        'Authorization' => 'Bearer ' . $req->get("token")
-    ])
-        ->get('https://api-v3.celerypayroll.com/employers');
-    
-    // Check if the request was successful
-    if ($response->successful()) {
-        // Process the response
-        $data = $response->json(); // Assuming the response is in JSON format
-        // You can also use $response->body() to access the raw response content
-        // or $response->status() to get the HTTP status code
-        // ...
-        return $data;
-    } else {
-        // Handle the request failure
-        echo 'GET request failed. Status code: ' . $response->status();
-    }
-});
-
 Route::get('/registration', function () {
     return redirect(app()->getLocale().'/registration');
+});
+
+Route::get("/celery/callback", function(Request $request) {
+    $code = $request->query('code');
+    $locale = $request->query('locale');
+    $userState = $request->query('userState');
+    return redirect('en'.'/celery/callback?code='.$code.'&locale='.$locale.'&userSate='.$userState);
 });
 
 Route::group(['prefix' => '{locale}', 'middleware' => 'setlocale'], function() {
@@ -105,6 +64,17 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'setlocale'], function() {
     
     #Route::group(['middleware' => ['auth']], function () {
     Route::group(['middleware' => ['auth', 'check_gfa_authenticated']], function () {
+
+
+        Route::group(['prefix' => 'celery'], function () {
+            Route::get('/callback', [CeleryController::class, 'index']);
+            Route::get('/contexts', [CeleryController::class, 'contexts']);
+            Route::get('/employers', [CeleryController::class, 'employers']);
+            Route::get('/employees', [CeleryController::class, 'employees']);
+            Route::post('/save_employees', [CeleryController::class, 'save_employees']);
+        });
+        
+
         Route::match(['get', 'post'], '/', [UserController::class, 'dashboard']);
         Route::get('/logout', [UserController::class, 'logout']);
         Route::match(['get', 'post'], '/profile', [UserController::class, 'profile']);

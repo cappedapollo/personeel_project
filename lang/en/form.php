@@ -154,6 +154,9 @@ return [
         'new' => 'New',
         'delete_title' => 'Delete :title',
         'to' => 'To',
+        'import' => 'Import',
+        'from' => 'From',
+        'celery' => "Celery"
     ],
 ];
 ?>

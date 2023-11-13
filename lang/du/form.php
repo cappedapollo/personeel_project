@@ -154,6 +154,9 @@ return [
         'new' => 'Nieuwe',
         'delete_title' => 'Verwijderen :title',
         'to' => 'Naar',
+        'import' => 'Importeren',
+        'from' => 'Van',
+        'celery' => "Selderij"
     ],
 ];
 ?>
