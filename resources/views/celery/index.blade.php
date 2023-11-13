@@ -138,13 +138,16 @@
                 DataTableEl.clear();
                 if(tableData && tableData.length > 0) {
                     data = tableData.map(({
+                        contact: {email},
                         first_name,
                         surname,
                         position,
                     })=> ({
+                        email,
                         first_name,
                         surname,
                         position,
+                        status: "active"
                     }));
                     
                 } else {
@@ -217,9 +220,11 @@
     $(function() {
         DataTableEl = $('#employee_table').DataTable({
             "columns": [
+                { "title": "Email", "data": "email" },
                 { "title": "First Name", "data": "first_name" },
                 { "title": "Last Name", "data": "surname" },
-                { "title": "Position", "data": "position" }
+                { "title": "Position", "data": "position" },
+                { "title": "Position", "data": "status" }
             ]
         });
         GetContexts()
