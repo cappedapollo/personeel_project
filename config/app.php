@@ -56,6 +56,16 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'main_url' => env('APP_MAIN_URL'),
+
+    'celery_login_url' => env('APP_CELERY_LOGIN_URL'),
+
+    'celery_api_url' => env('APP_CELERY_API_URL'),
+
+    'celery_client_id' => env('CELERY_CLIENT_ID'),
+
+    'celery_secret' => env('CELERY_SECRET'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*

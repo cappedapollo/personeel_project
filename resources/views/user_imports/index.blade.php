@@ -54,7 +54,7 @@ $template_dir = config('filesystems.dirs.template');
         			</div>
         			<!-- <a href="{{ asset($storage_path.$template_dir.'/personeel_template.csv') }}" class="btn btn-secondary mr-2">{{ __('form.label.download').' '.__('form.label.template') }}</a> -->
 
-					<a href="{{ 'https://login.celerypayroll.com/oauth2/authorize?scope=offline_access&client_id=8f771a5a-15a9-47ab-9670-1f8c09a1722b&response_type=code&redirect_uri='. urlencode(url('/celery/callback')) }}" class="btn btn-outline-danger mr-2">{{ __('form.label.import').' '.__('form.label.from').' '.__('form.label.celery') }}</a>
+					<a href="{{ config('app.celery_login_url').'/oauth2/authorize?scope=offline_access&client_id=8f771a5a-15a9-47ab-9670-1f8c09a1722b&response_type=code&redirect_uri='. urlencode(url('/celery/callback')) }}" class="btn btn-outline-danger mr-2">{{ __('form.label.import').' '.__('form.label.from').' '.__('form.label.celery') }}</a>
 
         		</div>
         	</div>

@@ -83,7 +83,7 @@ if($lang=='en') {
 		<footer>
         	<div class="row">
         		<hr/>
-        		<span class="text-left col-10">{!! $date.' | '.env('APP_MAIN_URL') !!}</span>
+        		<span class="text-left col-10">{!! $date.' | '.config('app.main_url') !!}</span>
         		<span class="pagenum text-right col-2"></span>
     		</div>
 		</footer>

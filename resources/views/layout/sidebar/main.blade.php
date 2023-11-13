@@ -118,7 +118,7 @@ $role_code = Auth::user()->user_role->role_code;
 <!-- support/contact -->
 <li class="menu-item" aria-haspopup="true">
 	<span class="menu-link">
-		<a href="{{ '//'.env('APP_MAIN_URL').'/support' }}" class="btn btn-light-warning w-100 text-left" target="_blank">
+		<a href="{{ '//'.config('app.main_url').'/support' }}" class="btn btn-light-warning w-100 text-left" target="_blank">
     		<i class="flaticon-chat icon-lg"></i> {{ __('form.label.support') }}
 		</a>
 	</span>

@@ -59,7 +59,6 @@ class UserImportController extends Controller
                 } */
             }
         }
-        
         return view('user_imports.index', compact('page_title', 'imports'));
     }
 

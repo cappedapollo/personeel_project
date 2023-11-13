@@ -25,12 +25,12 @@ class CeleryController extends Controller
             ->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/x-www-form-urlencoded',
-                'Authorization' => 'Basic ' . base64_encode(env('CELERY_CLIENT_ID') . ":" . env('CELERY_SECRET'))
+                'Authorization' => 'Basic ' . base64_encode(config('app.celery_client_id') . ":" . config('app.celery_secret'))
             ])
-            ->post(env('APP_CELERY_LOGIN_URL'.'/oauth2/token'), [
+            ->post(config('app.celery_login_url').'/oauth2/token', [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri'=> env('APP_MAIN_URL')."/celery/callback"
+                'redirect_uri'=> url('/celery/callback')
             ]);
 
         if ($response->successful()) {
@@ -48,7 +48,7 @@ class CeleryController extends Controller
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get(env('APP_CELERY_API_URL').'/contexts');
+            ->get(config('app.celery_api_url').'/contexts');
         
         if ($response->successful()) {
             $data = $response->json(); 
@@ -66,7 +66,7 @@ class CeleryController extends Controller
             'X-Celery-Context-Id' => $request->context_id,
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get(env('APP_CELERY_API_URL').'/employers?status=active');
+            ->get(config('app.celery_api_url').'/employers?status=active');
         
         if ($response->successful()) {
             $data = $response->json(); 
@@ -85,7 +85,7 @@ class CeleryController extends Controller
             'X-Celery-Employer-Id' => $request->employer_id,
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get(env('APP_CELERY_API_URL').'/employees?status=active');
+            ->get(config('app.celery_api_url').'/employees?status=active');
         
         if ($response->successful()) {
             $data = $response->json(); 
