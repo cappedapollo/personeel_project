@@ -38,7 +38,7 @@ Route::get("/celery/callback", function(Request $request) {
     $code = $request->query('code');
     $locale = $request->query('locale');
     $userState = $request->query('userState');
-    return redirect('en'.'/celery/callback?code='.$code.'&locale='.$locale.'&userSate='.$userState);
+    return redirect(app()->getLocale().'/celery/callback?code='.$code.'&locale='.$locale.'&userSate='.$userState);
 });
 
 Route::group(['prefix' => '{locale}', 'middleware' => 'setlocale'], function() {
