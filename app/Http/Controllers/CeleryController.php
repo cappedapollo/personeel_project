@@ -25,12 +25,12 @@ class CeleryController extends Controller
             ->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/x-www-form-urlencoded',
-                'Authorization' => 'Basic ' . base64_encode("8f771a5a-15a9-47ab-9670-1f8c09a1722b" . ":" . "jXmuW4Vt-3KNH1mcN218fg4Ooh7hcN8OnAP_BjU0LEQ")
+                'Authorization' => 'Basic ' . base64_encode(env('CELERY_CLIENT_ID') . ":" . env('CELERY_SECRET'))
             ])
-            ->post('https://login.celerypayroll.com/oauth2/token', [
+            ->post(env('APP_CELERY_LOGIN_URL'.'/oauth2/token'), [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri'=> "http://127.0.0.1:8000/celery/callback"
+                'redirect_uri'=> env('APP_MAIN_URL')."/celery/callback"
             ]);
 
         if ($response->successful()) {
@@ -48,7 +48,7 @@ class CeleryController extends Controller
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get('https://api-v3.celerypayroll.com/contexts');
+            ->get(env('APP_CELERY_API_URL').'/contexts');
         
         if ($response->successful()) {
             $data = $response->json(); 
@@ -66,7 +66,7 @@ class CeleryController extends Controller
             'X-Celery-Context-Id' => $request->context_id,
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get('https://api-v3.celerypayroll.com/employers?status=active');
+            ->get(env('APP_CELERY_API_URL').'/employers?status=active');
         
         if ($response->successful()) {
             $data = $response->json(); 
@@ -85,7 +85,7 @@ class CeleryController extends Controller
             'X-Celery-Employer-Id' => $request->employer_id,
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get('https://api-v3.celerypayroll.com/employees?status=active');
+            ->get(env('APP_CELERY_API_URL').'/employees?status=active');
         
         if ($response->successful()) {
             $data = $response->json(); 
