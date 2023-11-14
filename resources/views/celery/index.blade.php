@@ -224,7 +224,7 @@
                 { "title": "First Name", "data": "first_name" },
                 { "title": "Last Name", "data": "surname" },
                 { "title": "Position", "data": "position" },
-                { "title": "Position", "data": "status" }
+                { "title": "Status", "data": "status" }
             ]
         });
         GetContexts()
