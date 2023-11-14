@@ -11,17 +11,67 @@ use Google2FA;
 
 class CeleryController extends Controller
 {
-    //
+    public function callback(Request $request) {
+        $code = $request->query('code');
+        $locale = $request->query('locale');
+        $userState = $request->query('userState');
+        return redirect(app()->getLocale().'/celery/callback?code='.$code.'&locale='.$locale.'&userSate='.$userState);
+    }
+
+    public function webhook(Request $request) {
+        App\Models\CeleryWebhook::create(["msg" => "Employees Info Changed."]);
+        return true;
+    }
+
     public function index(Request $request) {
         $page_title = __('form.label.celery');
         $code = $request->query('code');
-        $access_token = $this->access_token("$code");
-        if(!$access_token) return redirect(app()->getLocale().'/users/import');
+        $celery_token_found = App\Models\CeleryToken::first();
+        if($celery_token_found) {
+            $res = $this->access_token_refresh_token($celery_token_found->refresh_token);
+            $access_token = $res? $res["access_token"]: null;
+            if(!$access_token) return redirect(app()->getLocale().'/users/import');
+        } else {
+            $res = $this->access_token_with_code($code);
+            $access_token = $res? $res["access_token"]: null;
+            if(!$access_token) return redirect(app()->getLocale().'/users/import');
+        }
         return view("celery.index", compact('page_title', 'access_token'));
     }
 
-    private function access_token($code) {
-        $response = Http::asForm()  // Specify the form URL-encoded format
+    private function access_token_refresh_token($refresh_token) {
+        $response = Http::asForm() 
+            ->withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Authorization' => 'Basic ' . base64_encode(config('app.celery_client_id') . ":" . config('app.celery_secret'))
+            ])
+            ->post(config('app.celery_login_url').'/oauth2/token', [
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refresh_token,
+                'redirect_uri'=> url('/celery/callback')
+            ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $celery_token_found = App\Models\CeleryToken::first();
+            if($celery_token_found) {
+                $celery_token_found->access_token = $data['access_token'];
+                $celery_token_found->refresh_token = $data['refresh_token'];
+                $celery_token_found->save();
+            } else {
+                App\Models\CeleryToken::create($data);
+            }
+            return $data;
+        } else {
+            // $response->status();
+            return null;
+        }
+    }
+
+
+    private function access_token_with_code($code) {
+        $response = Http::asForm() 
             ->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -35,7 +85,15 @@ class CeleryController extends Controller
 
         if ($response->successful()) {
             $data = $response->json();
-            return $data["access_token"];
+            $celery_token_found = App\Models\CeleryToken::first();
+            if($celery_token_found) {
+                $celery_token_found->access_token = $data['access_token'];
+                $celery_token_found->refresh_token = $data['refresh_token'];
+                $celery_token_found->save();
+            } else {
+                App\Models\CeleryToken::create($data);
+            }
+            return $data;
         } else {
             // $response->status();
             return null;
@@ -154,6 +212,8 @@ class CeleryController extends Controller
                 }
             }
         }
+
+        App\Models\CeleryWebhook::truncate();
 
         return json_encode(["success"=> true]);
     }
