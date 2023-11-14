@@ -16,7 +16,7 @@
     </div>
 	<div class="card-body">
         <div class="row mb-5 align-items-end">
-			<div class="col-lg-5">
+			<div class="col-lg-5 d-none">
 				<label class="font-weight-bold">
 					Contexts:
 					<a href="#" class="btn btn-icon btn-xs btn-light-primary btn-circle" data-toggle="tooltip" data-placement="right" title="Please select context.">
