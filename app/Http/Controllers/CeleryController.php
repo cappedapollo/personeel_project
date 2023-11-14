@@ -66,7 +66,7 @@ class CeleryController extends Controller
             'X-Celery-Context-Id' => $request->context_id,
             'Authorization' => 'Bearer ' . $request->access_token
         ])
-            ->get(config('app.celery_api_url').'/employers?status=active');
+            ->get(config('app.celery_api_url').'/employers');
         
         if ($response->successful()) {
             $data = $response->json(); 
@@ -100,6 +100,9 @@ class CeleryController extends Controller
         $celery_employees = $request->json("employees");
         $user_role = App\Models\UserRole::firstWhere('role_code', 'employee');
 
+        $created_by = Auth::id();
+        $company_id = Auth::user()->company_user->company_id;
+        
         foreach($celery_employees as $e) {
             $celery_user = App\Models\User::where('celery_id', $e['id'])->first();
             if ($celery_user) {
@@ -112,8 +115,7 @@ class CeleryController extends Controller
                 $celery_user->save();
             }else{
                 // Insert
-                $created_by = Auth::id();
-                $company_id = Auth::user()->company_user->company_id;
+                
                 $status = 'active';
                 $password = getRandomString(8);
 
@@ -134,7 +136,7 @@ class CeleryController extends Controller
                 $new['gfa_authenticated'] = 0;
                 $new["google2fa_secret"] = Google2FA::generateSecretKey();
                 $new['gfa_setup'] = 0;
-                $new['performance_email_sent'] = 1;
+                $new['performance_email_sent'] = 0;
 
                 if($inserted_data = App\Models\User::create($new)) {
                     # add company user data
