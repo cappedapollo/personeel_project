@@ -59,7 +59,7 @@ class CeleryController extends Controller
                         'X-Celery-Employer-Id' => $employer_id,
                         'Authorization' => 'Bearer ' . $access_token
                     ])
-                        ->get(config('app.celery_api_url').'/employees/' + $employee_id);
+                        ->get(config('app.celery_api_url').'/employees/'.$employee_id);
                     
                     if ($response_employee->successful()) {
                         $data2 = $response_employee->json(); 
