@@ -36,8 +36,6 @@ Route::get('/registration', function () {
 
 Route::get("/celery/callback", [CeleryController::class, 'callback']);
 
-Route::get("/celery/webhook", [CeleryController::class, 'webhook']);
-
 Route::group(['prefix' => '{locale}', 'middleware' => 'setlocale'], function() {
     #Route::get('/add_gfa_secret', [UserController::class, 'add_gfa_secret']);
     
