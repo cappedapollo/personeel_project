@@ -131,14 +131,22 @@ class CeleryController extends Controller
             }
         }
 
-        App\Models\CeleryWebhook::create(["msg" => "Employee Info Changed.".$triggered_at]);
+        $celery_webhook_found = App\Models\CeleryWebhook::where("company_id", $company_id)->first();
+        
+        if($celery_webhook_found) {
+            $celery_webhook_found->msg = "Employee Info Changed.".$triggered_at; 
+            $celery_webhook_found->save();
+        } else {
+            App\Models\CeleryWebhook::create(["msg" => "Employee Info Changed.".$triggered_at, "company_id" => $company_id]);
+        }
         return ["msg" => "No Update."];
     }
 
     public function index(Request $request) {
         $page_title = __('form.label.celery');
         $code = $request->query('code');
-        $celery_token_found = App\Models\CeleryToken::first();
+        $company_id = Auth::user()->company_user->company_id;
+        $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
         if($celery_token_found) {
             $res = $this->access_token_refresh_token($celery_token_found->refresh_token);
             $access_token = $res? $res["access_token"]: null;
@@ -166,7 +174,9 @@ class CeleryController extends Controller
 
         if ($response->successful()) {
             $data = $response->json();
-            $celery_token_found = App\Models\CeleryToken::first();
+            $company_id = Auth::user()->company_user->company_id;
+            $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
+            $data['company_id'] = $company_id;
             if($celery_token_found) {
                 $celery_token_found->access_token = $data['access_token'];
                 $celery_token_found->refresh_token = $data['refresh_token'];
@@ -197,7 +207,9 @@ class CeleryController extends Controller
 
         if ($response->successful()) {
             $data = $response->json();
-            $celery_token_found = App\Models\CeleryToken::first();
+            $company_id = Auth::user()->company_user->company_id;
+            $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
+            $data['company_id'] = $company_id;
             if($celery_token_found) {
                 $celery_token_found->access_token = $data['access_token'];
                 $celery_token_found->refresh_token = $data['refresh_token'];
@@ -324,7 +336,11 @@ class CeleryController extends Controller
                 }
             }
         }
-        App\Models\CeleryWebhook::truncate();
+        $celery_webhook_found = App\Models\CeleryWebhook::where("company_id", $company_id)->first();
+        
+        if($celery_webhook_found) {
+            $celery_webhook_found->delete();
+        }
         
         return json_encode(["success"=> true]);
     }
