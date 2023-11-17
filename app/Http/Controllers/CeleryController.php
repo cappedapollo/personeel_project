@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +21,8 @@ class CeleryController extends Controller
 
     public function webhook(Request $request) {
 
+        $header_email = (request()->header()['php-auth-user'][0]);
+        
         // GET EVENT INFO
         $resource = $request->json('resource'); // "EMPLOYEE"
         $employee_id = $request->json('resource_id');
@@ -30,8 +33,8 @@ class CeleryController extends Controller
         // USER ROLE
         $user_role = App\Models\UserRole::firstWhere('role_code', 'employee');
 
-        $created_by = Auth::id();
-        $company_id = Auth::user()->company_user->company_id;
+        $created_by = App\Models\User::where('email', $header_email)->first()->id;
+        $company_id = App\Models\User::where('email', $header_email)->first()->company_user->company_id;
 
         // TOKEN CHECK
         $celery_token_found = App\Models\CeleryToken::first();
