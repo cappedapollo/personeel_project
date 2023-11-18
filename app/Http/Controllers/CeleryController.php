@@ -21,6 +21,8 @@ class CeleryController extends Controller
 
     public function webhook(Request $request) {
 
+        Log::info('Request header: {header}', ['header' => json_encode($request->header())]);
+        
         $header_email = (request()->header()['php-auth-user'][0]);
         
         // GET EVENT INFO
