@@ -23,7 +23,7 @@ class CeleryController extends Controller
 
         Log::info('Request header: {header}', ['header' => json_encode($request->header())]);
         
-        $header_email = (request()->header()['php-auth-user'][0]);
+        $header_email = (request()->header()['x-auth-username'][0]);
         
         // GET EVENT INFO
         $resource = $request->json('resource'); // "EMPLOYEE"
@@ -35,14 +35,16 @@ class CeleryController extends Controller
         // USER ROLE
         $user_role = App\Models\UserRole::firstWhere('role_code', 'employee');
 
-        $created_by = App\Models\User::where('email', $header_email)->first()->id;
-        $company_id = App\Models\User::where('email', $header_email)->first()->company_user->company_id;
+        $auth_user = App\Models\User::where('email', $header_email)->first();
+
+        $created_by = $auth_user->id;
+        $company_id = $auth_user->company_user->company_id;
 
         // TOKEN CHECK
-        $celery_token_found = App\Models\CeleryToken::first();
+        $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
 
         if($celery_token_found) {
-            $res = $this->access_token_refresh_token($celery_token_found->refresh_token);
+            $res = $this->access_token_refresh_token_by_email($celery_token_found->refresh_token, $header_email);
             $access_token = $res? $res["access_token"]: null;
             if($access_token) {
 
@@ -191,6 +193,38 @@ class CeleryController extends Controller
             // $response->status();
             return null;
         }
+    }
+
+    private function access_token_refresh_token_by_email($refresh_token, $email) {
+        $response = Http::asForm() 
+        ->withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Authorization' => 'Basic ' . base64_encode(config('app.celery_client_id') . ":" . config('app.celery_secret'))
+        ])
+        ->post(config('app.celery_login_url').'/oauth2/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refresh_token,
+            'redirect_uri'=> url('/celery/callback')
+        ]);
+
+    if ($response->successful()) {
+        $data = $response->json();
+        $company_id = App\Models\User::where('email', $email)->first()->company_user->company_id;
+        $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
+        $data['company_id'] = $company_id;
+        if($celery_token_found) {
+            $celery_token_found->access_token = $data['access_token'];
+            $celery_token_found->refresh_token = $data['refresh_token'];
+            $celery_token_found->save();
+        } else {
+            App\Models\CeleryToken::create($data);
+        }
+        return $data;
+    } else {
+        // $response->status();
+        return null;
+    }
     }
 
 
