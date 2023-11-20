@@ -151,16 +151,69 @@ class CeleryController extends Controller
         $code = $request->query('code');
         $company_id = Auth::user()->company_user->company_id;
         $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
+        $res = null;
         if($celery_token_found) {
             $res = $this->access_token_refresh_token($celery_token_found->refresh_token);
-            $access_token = $res? $res["access_token"]: null;
-            if(!$access_token) return redirect(app()->getLocale().'/users/import');
         } else {
             $res = $this->access_token_with_code($code);
-            $access_token = $res? $res["access_token"]: null;
-            if(!$access_token) return redirect(app()->getLocale().'/users/import');
         }
+        $access_token = $res? $res["access_token"]: null;
+        if(!$access_token) return redirect(app()->getLocale().'/users/import');
+
+        $webhook = $this->fetch_webhook($access_token);
+
+        if(!$webhook || sizeof($webhook) == 0) {
+            $wh = $this->create_webhook($access_token);
+        }
+
         return view("celery.index", compact('page_title', 'access_token'));
+    }
+
+    private function fetch_webhook($access_token) {
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $access_token
+        ])
+            ->get(config('app.celery_api_url').'/webhooks?application_id='.config('app.celery_client_id'));
+        
+        if ($response->successful()) {
+            $data = $response->json(); 
+            return $data["data"];
+        } else {
+            // $response->status();
+            return null;
+        }
+    }
+
+    private function create_webhook($access_token) {
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $access_token
+        ])
+            ->post(config('app.celery_api_url').'/webhooks', [
+                "application_id" => config('app.celery_client_id'),
+                'email' => 'remco@personeelsbeoordeling.com',
+                'resource' => 'employee',
+                'url' => 'https://celery.personeelsbeoordeling.com/api/celery/webhook',
+                'status' => 'active',
+                'http_headers' => [
+                  'Content-Type' => 'application/json',
+                  'X-AUTH-USERNAME' => Auth::user()->email,
+                ],
+                'http_auth' => [
+                  'username' => Auth::user()->email,
+                  'password' => '123456',
+                ],
+            ]);
+        
+        if ($response->successful()) {
+            $data = $response->json(); 
+            return $data["data"];
+        } else {
+            return $response;
+            return null;
+        }
     }
 
     private function access_token_refresh_token($refresh_token) {
