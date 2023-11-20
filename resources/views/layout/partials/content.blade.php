@@ -2,7 +2,7 @@
 <div class="d-flex flex-column-fluid">
     <div class="container">
         @auth
-            $wh = App\Models\CeleryWebhook::where('company_id',  Auth::user()->company_user->company_id)->first();
+            @php $wh = App\Models\CeleryWebhook::where('company_id',  Auth::user()->company_user->company_id)->first(); @endphp
             @if ($wh)
             <div class="alert alert-custom alert-warning fade show" role="alert">
                 <div class="alert-text">{{ $wh->msg }}</div>
