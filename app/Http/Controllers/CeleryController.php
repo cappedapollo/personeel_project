@@ -20,10 +20,6 @@ class CeleryController extends Controller
     }
 
     public function webhook(Request $request) {
-
-        Log::info('Request header: {header}', ['header' => json_encode($request->header())]);
-        
-        $header_email = (request()->header()['x-auth-username'][0]);
         
         // GET EVENT INFO
         $resource = $request->json('resource'); // "EMPLOYEE"
@@ -35,115 +31,129 @@ class CeleryController extends Controller
         // USER ROLE
         $user_role = App\Models\UserRole::firstWhere('role_code', 'employee');
 
-        $auth_user = App\Models\User::where('email', $header_email)->first();
+        Log::info('Request header: {header}', ['header' => json_encode($request->header())]);
+        
+        $header_email = (request()->header()['x-auth-username'][0]);
 
-        $created_by = $auth_user->id;
-        $company_id = $auth_user->company_user->company_id;
+        foreach(explode(",", $header_email) as $user_email) {
+            $auth_user = App\Models\User::where('email', $user_email)->first();
 
-        // TOKEN CHECK
-        $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
+            if($auth_user == null) break;
+            
+            $created_by = $auth_user->id;
+            $company_id = $auth_user->company_user->company_id;
 
-        if($celery_token_found) {
-            $res = $this->access_token_refresh_token_by_email($celery_token_found->refresh_token, $header_email);
-            $access_token = $res? $res["access_token"]: null;
-            if($access_token) {
+            // TOKEN CHECK
+            $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
 
-                // GET CONTEXTS
-                $response_context = Http::withHeaders([
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer ' . $access_token
-                ])
-                    ->get(config('app.celery_api_url').'/contexts');
-                
-                if ($response_context->successful()) {
-                    $data1 = $response_context->json(); 
-                    $context = $data1["data"][0];
-    
-                    // GET A SINGLE EMPLOYEE INFO
-                    $response_employee = Http::withHeaders([
+            $flag = false;
+
+            if($celery_token_found) {
+                $res = $this->access_token_refresh_token_by_email($celery_token_found->refresh_token, $header_email);
+                $access_token = $res? $res["access_token"]: null;
+                if($access_token) {
+
+                    // GET CONTEXTS
+                    $response_context = Http::withHeaders([
                         'Accept' => 'application/json',
-                        'X-Celery-Context-Id' => $context['id'],
-                        'X-Celery-Employer-Id' => $employer_id,
                         'Authorization' => 'Bearer ' . $access_token
                     ])
-                        ->get(config('app.celery_api_url').'/employees/'.$employee_id);
+                        ->get(config('app.celery_api_url').'/contexts');
                     
-                    if ($response_employee->successful()) {
-                        $data2 = $response_employee->json(); 
-                        $e = $data2["data"];
+                    if ($response_context->successful()) {
+                        $data1 = $response_context->json(); 
+                        $context = $data1["data"][0];
+        
+                        // GET A SINGLE EMPLOYEE INFO
+                        $response_employee = Http::withHeaders([
+                            'Accept' => 'application/json',
+                            'X-Celery-Context-Id' => $context['id'],
+                            'X-Celery-Employer-Id' => $employer_id,
+                            'Authorization' => 'Bearer ' . $access_token
+                        ])
+                            ->get(config('app.celery_api_url').'/employees/'.$employee_id);
                         
-                        if($event_type == "CREATE") {
-                            $celery_user = App\Models\User::where('celery_id', $employee_id)->first();
-                            if (!$celery_user) {
-                                $status = 'active';
-                                $password = getRandomString(8);
-                                
-                                $new["user_role_id"] = $user_role->id;
-                                $new['created_by'] = $created_by;
-                                $new['celery_id'] = $e['id'];
-                                $new['first_name'] = $e['first_name'];
-                                $new['last_name'] = $e['surname'];
-                                $new['email'] = $e["contact"]['email']?: "";
-                                $new['password'] = Hash::make($password);
-                                $new['country_code'] = null;
-                                // $new['telephone'] = $e['contact']['phone'];
-                                $new['function'] = $e['position'];
-                                $new['status'] = $status;
-                                $new['email_verified'] = 'yes';
-                                $new['token'] = null;
-                                $new['first_login'] = 0;
-                                $new['gfa_authenticated'] = 0;
-                                $new["google2fa_secret"] = Google2FA::generateSecretKey();
-                                $new['gfa_setup'] = 0;
-                                $new['performance_email_sent'] = 0;
-                
-                                if($inserted_data = App\Models\User::create($new)) {
-                                    # add company user data
-                                    $cu_data['company_id'] = $company_id;
-                                    $cu_data['user_id'] = $inserted_data->id;
-                                    App\Models\CompanyUser::create($cu_data);
+                        if ($response_employee->successful()) {
+                            $data2 = $response_employee->json(); 
+                            $e = $data2["data"];
+                            
+                            if($event_type == "CREATE") {
+                                $celery_user = App\Models\User::where('celery_id', $employee_id)->first();
+                                if (!$celery_user) {
+                                    $status = 'active';
+                                    $password = getRandomString(8);
                                     
-                                    # send temporary password
-                                    if ($status == 'active' && $user_role->id != $new['user_role_id']) {
-                                        $mail_data = ['email'=>$inserted_data->email, 'password'=>$password];
-                                        Mail::send('emails.'.app()->getLocale().'.user_registered', compact('mail_data'), function($message) use ($mail_data) {
-                                            $message->to($mail_data['email'])->subject(__('email.subject.user_registered'));
-                                        });
+                                    $new["user_role_id"] = $user_role->id;
+                                    $new['created_by'] = $created_by;
+                                    $new['celery_id'] = $e['id'];
+                                    $new['first_name'] = $e['first_name'];
+                                    $new['last_name'] = $e['surname'];
+                                    $new['email'] = $e["contact"]['email']?: "";
+                                    $new['password'] = Hash::make($password);
+                                    $new['country_code'] = null;
+                                    // $new['telephone'] = $e['contact']['phone'];
+                                    $new['function'] = $e['position'];
+                                    $new['status'] = $status;
+                                    $new['email_verified'] = 'yes';
+                                    $new['token'] = null;
+                                    $new['first_login'] = 0;
+                                    $new['gfa_authenticated'] = 0;
+                                    $new["google2fa_secret"] = Google2FA::generateSecretKey();
+                                    $new['gfa_setup'] = 0;
+                                    $new['performance_email_sent'] = 0;
+                    
+                                    if($inserted_data = App\Models\User::create($new)) {
+                                        # add company user data
+                                        $cu_data['company_id'] = $company_id;
+                                        $cu_data['user_id'] = $inserted_data->id;
+                                        App\Models\CompanyUser::create($cu_data);
+                                        
+                                        # send temporary password
+                                        if ($status == 'active' && $user_role->id != $new['user_role_id']) {
+                                            $mail_data = ['email'=>$inserted_data->email, 'password'=>$password];
+                                            Mail::send('emails.'.app()->getLocale().'.user_registered', compact('mail_data'), function($message) use ($mail_data) {
+                                                $message->to($mail_data['email'])->subject(__('email.subject.user_registered'));
+                                            });
+                                        }
                                     }
                                 }
+                            } else if($event_type == "UPDATE") {
+                                $celery_user = App\Models\User::where('celery_id', $employee_id)->first();
+                                if($celery_user) {
+                                    $celery_user['first_name'] = $e['first_name'];
+                                    $celery_user['last_name'] = $e['surname'];
+                                    $celery_user['email'] = $e["contact"]['email']?: "";
+                                    // $celery_user['telephone'] = $e['contact']['phone'];
+                                    $celery_user['function'] = $e['position'];
+                                    $celery_user->save();
+                                }
+                            } else if($event_type == "DELETE"){ 
+                                $celery_user = App\Models\User::where('celery_id', $employee_id)->first();
+                                if($celery_user) {
+                                    $celery_user->delete();
+                                }
                             }
-                        } else if($event_type == "UPDATE") {
-                            $celery_user = App\Models\User::where('celery_id', $employee_id)->first();
-                            if($celery_user) {
-                                $celery_user['first_name'] = $e['first_name'];
-                                $celery_user['last_name'] = $e['surname'];
-                                $celery_user['email'] = $e["contact"]['email']?: "";
-                                // $celery_user['telephone'] = $e['contact']['phone'];
-                                $celery_user['function'] = $e['position'];
-                                $celery_user->save();
-                            }
-                        } else if($event_type == "DELETE"){ 
-                            $celery_user = App\Models\User::where('celery_id', $employee_id)->first();
-                            if($celery_user) {
-                                $celery_user->delete();
-                            }
+                            
+                            $flag = true;
+                            // return ["msg" => "Employee Info Changed."];
                         }
-                      
-                        return ["msg" => "Employee Info Changed."];
                     }
+                }
+            }
+
+            if(!$flag) {
+                $celery_webhook_found = App\Models\CeleryWebhook::where("company_id", $company_id)->first();
+            
+                if($celery_webhook_found) {
+                    $celery_webhook_found->msg = "Employee Info Changed.".$triggered_at; 
+                    $celery_webhook_found->save();
+                } else {
+                    App\Models\CeleryWebhook::create(["msg" => "Employee Info Changed.".$triggered_at, "company_id" => $company_id]);
                 }
             }
         }
 
-        $celery_webhook_found = App\Models\CeleryWebhook::where("company_id", $company_id)->first();
-        
-        if($celery_webhook_found) {
-            $celery_webhook_found->msg = "Employee Info Changed.".$triggered_at; 
-            $celery_webhook_found->save();
-        } else {
-            App\Models\CeleryWebhook::create(["msg" => "Employee Info Changed.".$triggered_at, "company_id" => $company_id]);
-        }
-        return ["msg" => "No Update."];
+        return ["msg" => "Webhook success."];
     }
 
     public function index(Request $request) {
@@ -152,11 +162,11 @@ class CeleryController extends Controller
         $company_id = Auth::user()->company_user->company_id;
         $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();
         $res = null;
-        if($celery_token_found) {
-            $res = $this->access_token_refresh_token($celery_token_found->refresh_token);
-        } else {
+        // if($celery_token_found) {
+            // $res = $this->access_token_refresh_token($celery_token_found->refresh_token);
+        // } else {
             $res = $this->access_token_with_code($code);
-        }
+        // }
         $access_token = $res? $res["access_token"]: null;
         if(!$access_token) return redirect(app()->getLocale().'/users/import');
 
@@ -164,6 +174,9 @@ class CeleryController extends Controller
 
         if(!$webhook || sizeof($webhook) == 0) {
             $wh = $this->create_webhook($access_token);
+        } else {
+            if(strpos($webhook[0]["http_headers"]["X-AUTH-USERNAME"], Auth::user()->email) === false)
+                $wh = $this->update_webhook($access_token, $webhook[0]);
         }
 
         return view("celery.index", compact('page_title', 'access_token'));
@@ -202,8 +215,38 @@ class CeleryController extends Controller
                   'X-AUTH-USERNAME' => Auth::user()->email,
                 ],
                 'http_auth' => [
-                  'username' => Auth::user()->email,
+                  'username' => "root",
                   'password' => '123456',
+                ],
+            ]);
+        
+        if ($response->successful()) {
+            $data = $response->json(); 
+            return $data["data"];
+        } else {
+            return null;
+        }
+    }
+
+    private function update_webhook($access_token, $old) {
+        
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $access_token
+        ])
+            ->put(config('app.celery_api_url').'/webhooks/'.$old["id"], [
+                'email' => 'remco@personeelsbeoordeling.com',
+                'resource' => 'employee',
+                'url' => 'https://celery.personeelsbeoordeling.com/api/celery/webhook',
+                'status' => 'active',
+                'http_headers' => [
+                  'Content-Type' => 'application/json',
+                  'X-AUTH-USERNAME' => $old["http_headers"]["X-AUTH-USERNAME"].','.Auth::user()->email,
+                ],
+                'http_auth' => [
+                    'username' => "root",
+                    'password' => '123456',
                 ],
             ]);
         
