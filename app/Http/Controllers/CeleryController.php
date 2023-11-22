@@ -49,7 +49,7 @@ class CeleryController extends Controller
             $flag = false;
 
             if($celery_token_found) {
-                $res = $this->access_token_refresh_token_by_email($celery_token_found->refresh_token, $header_email);
+                $res = $this->access_token_refresh_token_by_email($celery_token_found->refresh_token, $user_email);
                 $access_token = $res? $res["access_token"]: null;
                 if($access_token) {
 
