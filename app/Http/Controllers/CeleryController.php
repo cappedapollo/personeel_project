@@ -157,7 +157,7 @@ class CeleryController extends Controller
     }
 
     public function index(Request $request) {
-        $page_title = __('form.label.celery');
+        $page_title = __('celery.label.celery');
         $code = $request->query('code');
         $company_id = Auth::user()->company_user->company_id;
         $celery_token_found = App\Models\CeleryToken::where('company_id', $company_id)->first();

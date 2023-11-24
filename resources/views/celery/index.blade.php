@@ -140,12 +140,11 @@
                         contact: {email},
                         first_name,
                         surname,
-                        surname_prefix,
                         position,
                     })=> ({
                         email,
                         first_name,
-                        surname: (surname_prefix && surname_prefix !== "")? (surname_prefix + " " + surname): surname,
+                        surname,
                         position,
                         status: "active"
                     }));
