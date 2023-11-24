@@ -153,10 +153,7 @@ return [
         'support' => 'Support',
         'new' => 'New',
         'delete_title' => 'Delete :title',
-        'to' => 'To',
-        'import' => 'Import',
-        'from' => 'From',
-        'celery' => "Celery"
+        'to' => 'To'
     ],
 ];
 ?>

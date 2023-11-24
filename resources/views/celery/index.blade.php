@@ -30,7 +30,7 @@
 
             <div class="col-lg-5">
 				<label class="font-weight-bold">
-					Employers:
+                    {{ __('celery.label.employer') }}:
 					<a href="#" class="btn btn-icon btn-xs btn-light-primary btn-circle" data-toggle="tooltip" data-placement="right" title="Please select employer.">
     					<i class="fas fa-info-circle"></i>
     				</a>
@@ -40,7 +40,7 @@
     			</select>
 			</div>
             <div class="col-lg-2">
-                <button class="btn btn-primary btn-block" onclick="SaveEmployees()">Save</button>
+                <button class="btn btn-primary btn-block" onclick="SaveEmployees()">{{ __('celery.label.import') }}</button>
             </div>
 		</div>
 
@@ -88,7 +88,6 @@
 			error: function(xhr, status, error) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
                 CONTEXT_EL.prop("disabled", false)
-				console.error(error);
 			}
 		});
 	}
@@ -118,7 +117,6 @@
 			error: function(xhr, status, error) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
                 EMPOYER_EL.prop("disabled", false)
-				console.error(error);
 			}
 		});
 	}
@@ -134,18 +132,20 @@
 			method: 'GET',
 			success: function(data) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
-                tableData = data.filter(({contact: {email}})=>!!email);
+                tableData = data.filter(({contact: {email}})=>!!email)
+                    .map((item) => ({...item, surname: (item.surname_prefix && item.surname_prefix !== "")? (item.surname_prefix + " " + item.surname): item.surname}));
                 DataTableEl.clear();
                 if(tableData && tableData.length > 0) {
                     data = tableData.map(({
                         contact: {email},
                         first_name,
                         surname,
+                        surname_prefix,
                         position,
                     })=> ({
                         email,
                         first_name,
-                        surname,
+                        surname: (surname_prefix && surname_prefix !== "")? (surname_prefix + " " + surname): surname,
                         position,
                         status: "active"
                     }));
@@ -159,7 +159,6 @@
 			},
 			error: function(xhr, status, error) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
-				console.error(error);
 			}
 		});
 	}
@@ -167,10 +166,10 @@
     function SaveEmployees() {
         if(tableData.length === 0) {
             swal.fire({
-                text: "There is no data to import.",
+                text: "{{ __('celery.message.no_import_data') }}",
                 icon: "error",
                 buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
+                confirmButtonText: "{{ __('celery.label.close') }}",
                 customClass: {
                     confirmButton: "btn font-weight-bold btn-light-primary"
                 }
@@ -193,10 +192,10 @@
 			success: function(data) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
                 swal.fire({
-                    text: "Import the employees from celery successfully.",
+                    text: "{{ __('celery.message.import_success') }}",
                     icon: "success",
                     buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
+                    confirmButtonText: "{{ __('celery.label.close') }}",
                     customClass: {
                         confirmButton: "btn font-weight-bold btn-light-primary"
                     }
@@ -205,10 +204,10 @@
 			error: function(xhr, status, error) {
                 LOADER_EL.removeClass("d-flex").addClass("d-none");
 				swal.fire({
-                    text: "Sorry, looks like there are some errors detected, please try again.",
+                    text: "{{ __('celery.message.import_fail') }}",
                     icon: "error",
                     buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
+                    confirmButtonText: "{{ __('celery.label.close') }}",
                     customClass: {
                         confirmButton: "btn font-weight-bold btn-light-primary"
                     }
